@@ -143,7 +143,10 @@ def yomutext(path):
 
 
 def kakubytes(path, data):
-    Path(path).write_bytes(angou(data))
+    path = Path(path)
+    tmp = path.with_name(f"{path.name}.{threading.get_ident()}.part")
+    tmp.write_bytes(angou(data))
+    tmp.replace(path)
 
 
 def kakutext(path, text):
@@ -374,18 +377,9 @@ if "hansou" in kotoba:
 
 
 def nuunchanyomu():
-    if not nuunchanfile.is_file():
-        data = {"users": {}, "ranking": {}}
-        kakutext(nuunchanfile, json.dumps(data, ensure_ascii=False, indent=2))
-        return data
-    try:
-        moji = yomutext(nuunchanfile)
-        data = json.loads(moji)
-        angoumigrate(nuunchanfile, moji)
-    except (json.JSONDecodeError, OSError, TypeError, ValueError):
-        data = {}
+    data = yomu(nuunchanfile, {"users": {}, "ranking": {}})
     if not isinstance(data, dict):
-        data = {}
+        raise RuntimeError(f"{nuunchanfile} の中身がオブジェクトではありません。")
     data.setdefault("users", {})
     data.setdefault("ranking", {})
     for user in data["users"].values():
@@ -397,13 +391,10 @@ def nuunchanyomu():
 nuunchan = nuunchanyomu()
 
 def learningexcludeyomu():
-    if not learningexcludefile.is_file():
-        return []
-    try:
-        data = json.loads(yomutext(learningexcludefile))
-    except (json.JSONDecodeError, OSError, TypeError, ValueError):
-        return []
-    return data if isinstance(data, list) else []
+    data = yomu(learningexcludefile, [])
+    if not isinstance(data, list):
+        raise RuntimeError(f"{learningexcludefile} の中身が配列ではありません。")
+    return data
 
 def learningexcludekaku(data):
     tmp = learningexcludefile.with_suffix(".tmp")
@@ -447,22 +438,18 @@ def nuunchankaku():
 def nuunchankaku_later(delay=5.0):
 
     global _nuunchan_timer
-    with _nuunchan_io:
-        if _nuunchan_timer is not None:
-            return
+    if _nuunchan_timer is not None:
+        return
 
-        def run():
-            global _nuunchan_timer
-            with _nuunchan_io:
-                _nuunchan_timer = None
-            try:
-                nuunchankaku()
-            except Exception as error:
-                print(f"nuunchan.json を保存できません: {error}")
+    def run():
+        global _nuunchan_timer
+        _nuunchan_timer = None
+        try:
+            nuunchankaku()
+        except Exception as error:
+            print(f"nuunchan.json を保存できません: {error}")
 
-        _nuunchan_timer = threading.Timer(delay, run)
-        _nuunchan_timer.daemon = True
-        _nuunchan_timer.start()
+    _nuunchan_timer = asyncio.get_running_loop().call_later(delay, run)
 
 
 def nuunchanuser(uid):
@@ -609,6 +596,15 @@ globalchat_links = {}
 globalchat_roots = {}
 globalchat_message_channels = {}
 globalchat_reaction_lock = set()
+globalchat_kioku_limit = 20000
+
+
+def globalchat_forget_old():
+    while len(globalchat_roots) > globalchat_kioku_limit:
+        mid = next(iter(globalchat_roots))
+        globalchat_roots.pop(mid, None)
+        globalchat_links.pop(mid, None)
+        globalchat_message_channels.pop(mid, None)
 
 
 def globalchat_root_id(message_id):
@@ -765,6 +761,7 @@ async def globalchat_relay(message):
             globalchat_links[mid] = ids
         for sent in sent_messages:
             globalchat_message_channels[sent.id] = sent.channel.id
+        globalchat_forget_old()
 
 
 async def globalchat_fetch_copy(mid):
@@ -819,18 +816,18 @@ async def globalchat_edit(message):
     embeds_by_channel = {}
     if not globalchat_links.get(root):
         return
-    files = []
-    for attachment in message.attachments:
-        try:
-            files.append(await attachment.to_file(use_cached=True))
-        except Exception:
-            continue
     for mid in ids:
         if mid == root:
             continue
         target = await globalchat_fetch_copy(mid)
         if not target:
             continue
+        files = []
+        for attachment in message.attachments:
+            try:
+                files.append(await attachment.to_file(use_cached=True))
+            except Exception:
+                continue
         try:
             embeds = await globalchat_build_embeds(message, edited=True, destination=target.channel)
             if not embeds:
@@ -4230,13 +4227,10 @@ KIYAKU_TEXT = (
 
 
 def consentyomu():
-    if not consentfile.is_file():
-        return {}
-    try:
-        data = json.loads(yomutext(consentfile))
-    except (json.JSONDecodeError, OSError, TypeError, ValueError):
-        return {}
-    return data if isinstance(data, dict) else {}
+    data = yomu(consentfile, {})
+    if not isinstance(data, dict):
+        raise RuntimeError(f"{consentfile} の中身がオブジェクトではありません。")
+    return data
 
 
 def consentkaku():
@@ -4383,7 +4377,7 @@ class Bot(commands.Bot):
 intents = discord.Intents.default()
                                                                    
 intents.message_content = True
-bot = Bot(command_prefix="!", intents=intents)
+bot = Bot(command_prefix="!", intents=intents, allowed_mentions=discord.AllowedMentions.none())
 
 
 nuunchang = app_commands.Group(name="ぬーんちゃん", description="あなたのぬーんちゃん", guild_only=True)
@@ -4599,11 +4593,12 @@ async def hannoukojinkeshi(yobi):
 async def hannouichi(yobi):
     if not kotoba["hannou"]:
         return await yobi.response.send_message("反応は登録されていないぬーん")
-    await yobi.response.send_message("\n".join(
+    text = "\n".join(
         f"{n} {'キーワード' if r.get('kiwado') else '常時'} "
         f"{r.get('ritsu', 0)}パーセント {r.get('bun') or '画像のみ'}"
         for n, r in enumerate(kotoba["hannou"], 1)
-    ))
+    )
+    await yobi.response.send_message(text if len(text) <= 2000 else text[:1999] + "…")
 
 
 @bot.tree.command(name="ぬーんガチャ", description="ぬーんガチャを引く")
@@ -4739,10 +4734,10 @@ async def gakushidatazen_sakujo(yobi):
     except Exception as error:
         data_purged = False
         if not yobi.response.is_done():
-            await yobi.response.send_message(f"えらーぬーん（{type(error).__name__}: {error}）-# お手数ですがふにゃくんまでご連絡いただけると幸いです。", ephemeral=True)
+            await yobi.response.send_message(f"えらーぬーん（{type(error).__name__}: {error}）\n-# お手数ですがふにゃくんまでご連絡いただけると幸いです。", ephemeral=True)
         else:
             try:
-                await yobi.followup.send(f"えらーぬーん（{type(error).__name__}: {error}）-# お手数ですがふにゃくんまでご連絡いただけると幸いです。", ephemeral=True)
+                await yobi.followup.send(f"えらーぬーん（{type(error).__name__}: {error}）\n-# お手数ですがふにゃくんまでご連絡いただけると幸いです。", ephemeral=True)
             except Exception:
                 pass
 
@@ -4824,7 +4819,7 @@ async def chishikirireki(yobi, channel: Optional[discord.TextChannel] = None, ke
     if not kengen(yobi):
         return await yobi.response.send_message(NASHI, ephemeral=True)
     channel = channel or yobi.channel
-    if learningexcluded(yobi.guild.id, channel.id, getattr(channel, "parent_id", 0) or channel.id):
+    if learningexcluded(yobi.guild.id, channel.id, 0):
         return await yobi.response.send_message("この場所は学習対象から除外されているぬーん", ephemeral=True)
     me = yobi.guild.me
     if not isinstance(channel, discord.TextChannel) or not channel.permissions_for(me).read_message_history:
@@ -4843,7 +4838,7 @@ async def chishikirireki(yobi, channel: Optional[discord.TextChannel] = None, ke
             seen += 1
             if seen % 10 == 0:
                 await asyncio.sleep(0)
-            a, b = shared_memory.chishiki_manabu(m.content, m.author.id, yobi.guild.id, channel.id if not isinstance(channel, discord.Thread) else channel.parent_id, channel.id if isinstance(channel, discord.Thread) else 0)
+            a, b = shared_memory.chishiki_manabu(m.content, m.author.id, yobi.guild.id, channel.id, 0)
             new += a
             upd += b
     except discord.Forbidden:
@@ -4884,6 +4879,18 @@ async def on_ready():
         print(guild.name)
 
 
+def renpo_ippai(uid, now):
+    q = renpo.get(uid)
+    if q is None:
+        return False
+    while q and now - q[0] >= renpo_window:
+        q.popleft()
+    if not q:
+        del renpo[uid]
+        return False
+    return len(q) >= renpo_limit
+
+
 @bot.event
 async def on_message(hatsu):
     if not hatsu.guild:
@@ -4904,6 +4911,11 @@ async def on_message(hatsu):
 
     gacha_text = re.sub(r"[\s　、。！？!?]", "", hatsu.content or "")
     if gachago in gacha_text:
+        now = time.monotonic()
+        if renpo_ippai(hatsu.author.id, now):
+            await bot.process_commands(hatsu)
+            return
+        renpo[hatsu.author.id].append(now)
         try:
             await hatsu.channel.send(**hiku())
         except discord.Forbidden:
@@ -4953,6 +4965,7 @@ async def on_message(hatsu):
                 if (
                     previous
                     and previous[0] != hatsu.author.id
+                    and consented(previous[0])
                     and now_for_learning - previous[2] <= 90
                 ):
                     _turn_started = time.perf_counter()
@@ -4971,16 +4984,13 @@ async def on_message(hatsu):
         shared_memory.save_async()    
 
     now = time.monotonic()
-    q = renpo[hatsu.author.id]
-    while q and now - q[0] >= renpo_window:
-        q.popleft()
-    if len(q) >= renpo_limit:
+    if renpo_ippai(hatsu.author.id, now):
         nuun.save_if_needed()
         if shared_memory.dirty:
             shared_memory.save_async()
         await bot.process_commands(hatsu)
         return
-    q.append(now)
+    renpo[hatsu.author.id].append(now)
 
     nuun_count = len(nuunrank_re.findall(hatsu.content))
     if nuun_count:
@@ -5086,7 +5096,7 @@ async def on_message(hatsu):
     except Exception as error:
         print(f"返信の生成中にエラー: {error}")
         error_text = f"{type(error).__name__}: {error}"[:1200]
-        error_message = f"えらーぬーん（{error_text}）-# お手数ですがふにゃくんまでご連絡いただけると幸いです。"
+        error_message = f"えらーぬーん（{error_text}）\n-# お手数ですがふにゃくんまでご連絡いただけると幸いです。"
         try:
             await hatsu.channel.send(error_message, allowed_mentions=discord.AllowedMentions.none())
         except discord.HTTPException as send_error:
@@ -5109,4 +5119,4 @@ async def on_message(hatsu):
 
 
 if __name__ == "__main__":
-    bot.run("とくくん")
+    bot.run(tokun)

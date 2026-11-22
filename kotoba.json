@@ -1,0 +1,255 @@
+{
+  "gacha": {
+    "N": {
+      "ritsu": 25,
+      "bun": "[N] のーんのーん（煽）",
+      "gazou": null
+    },
+    "N+": {
+      "ritsu": 18,
+      "bun": "[N+] なーんせーんす（煽）",
+      "gazou": null
+    },
+    "R": {
+      "ritsu": 18,
+      "bun": "[R] ぬーん",
+      "gazou": "nu-n.webp"
+    },
+    "USSR": {
+      "ritsu": 8,
+      "bun": "[USSR] ソビエ立つぬーん||別にレア度を考えるときにおもいついただけだし？特定の国なんて意識してるわけないじゃないですか。ただソビエ立ってるだけですよ？ぬぅぅぅぅぅん！だってでぇぇぇぇぇぇん！を意識してるわけないじゃないですか。断じて違いますからね！？ね？（圧）||（saltmaru作）",
+      "gazou": "soren.webp"
+    },
+    "RR": {
+      "ritsu": 8,
+      "bun": "[RR] でーん",
+      "gazou": "de-n.webp"
+    },
+    "RRR": {
+      "ritsu": 6,
+      "bun": "[RRR] ちーん",
+      "gazou": "ti-n.webp"
+    },
+    "RR+": {
+      "ritsu": 4,
+      "bun": "[RR+] ぐにゃーん",
+      "gazou": "gunya-n.webp"
+    },
+    "R+": {
+      "ritsu": 3,
+      "bun": "[R+] ぬぅん",
+      "gazou": null
+    },
+    "SR": {
+      "ritsu": 2,
+      "bun": "[SR] あ!ぬーん",
+      "gazou": "anu.gif"
+    },
+    "SSR(?)": {
+      "ritsu": 1,
+      "bun": "[SSR(?)] こんにちは!開発者です。よかったら君の鯖でもこのBOTいれてね!BOTのプロフィールにある鯖にも入ってほしいな🥺",
+      "gazou": "dev.webp"
+    },
+    "UR": {
+      "ritsu": 5,
+      "bun": "[UR] あふたぬーん（saltmaru作）",
+      "gazou": "after.webp"
+    },
+    "SUR": {
+      "ritsu": 2,
+      "bun": "[SUR] つつぬーん（saltmaru作）",
+      "gazou": "tutunun.webp"
+    }
+  },
+  "hannou": [
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 50,
+      "bun": "ぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "おはよ",
+      "ritsu": 100,
+      "bun": "あふたぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 50,
+      "bun": "-# あなたはぬーん教信者に改宗されました・[詳細](<https://ja.wikipedia.org/wiki/%E3%83%8C%E3%83%BC%E3%83%B3>)",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 25,
+      "bun": "ぬぅん",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 25,
+      "bun": "ぬぉん",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 25,
+      "bun": "ぬーる",
+      "gazou": "c.gif"
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 25,
+      "bun": "nun",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 2,
+      "bun": "ぬっぬううううううっんﾌﾞﾘｯ（脱糞）",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 10,
+      "bun": "ぬんぬんぬーん！（謎テンション）",
+      "gazou": null
+    },
+    {
+      "kiwado": [
+        "ぬーん",
+        "ぬぅん",
+        "nun",
+        "ぬん"
+      ],
+      "ritsu": 10,
+      "bun": "ぬぬぬぬぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "ありがとう",
+      "ritsu": 100,
+      "bun": "どういたしぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "やりますね",
+      "ritsu": 100,
+      "bun": "ぬーんスギィ",
+      "gazou": null
+    },
+    {
+      "kiwado": "おやすみ",
+      "ritsu": 100,
+      "bun": "はよねろぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "おお",
+      "ritsu": 100,
+      "bun": "ぬーおーーー",
+      "gazou": null
+    },
+    {
+      "kiwado": "ええ",
+      "ritsu": 100,
+      "bun": "うわぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "開示だな",
+      "ritsu": 100,
+      "bun": "ヒカマニからぬーん信者に転職しよう",
+      "gazou": null
+    },
+    {
+      "kiwado": "ゆねっさむ",
+      "ritsu": 100,
+      "bun": "もしかして：ぬーんっさむ",
+      "gazou": null
+    },
+    {
+      "kiwado": "ゆねっさむ",
+      "ritsu": 100,
+      "bun": "もしかして：ユネッサン",
+      "gazou": null
+    },
+    {
+      "kiwado": "おわった",
+      "ritsu": 100,
+      "bun": "のぉぉぉぉぉぉぉぉぉぉｎ！",
+      "gazou": null
+    },
+    {
+      "kiwado": "うるさい",
+      "ritsu": 100,
+      "bun": "# ぬーん",
+      "gazou": null
+    },
+    {
+      "kiwado": "ねえねえ",
+      "ritsu": 100,
+      "bun": "ぬーん！？！？！？",
+      "gazou": null
+    },
+    {
+      "kiwado": "俳句",
+      "ritsu": 100,
+      "bun": "ぬんぬんぬ、ぬぬぬぬぬぬぬ、ぬーんぬん",
+      "gazou": null
+    },
+    {
+      "kiwado": "死ね",
+      "ritsu": 100,
+      "bun": "しねとか言うなぬーんって言え",
+      "gazou": null
+    },
+    {
+      "kiwado": "しね",
+      "ritsu": 100,
+      "bun": "しねとか言うなぬーんって言え",
+      "gazou": null
+    }
+  ]
+}
